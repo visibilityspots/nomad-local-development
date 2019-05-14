@@ -1,4 +1,4 @@
-# Nomad consul prometheus
+# Nomad local development
 
 The aim of this project is to provide a development environment like docker-compose but without a vendor locking on docker based on [consul](https://www.consul.io/) by using [nomad](https://www.nomadproject.io)
 
