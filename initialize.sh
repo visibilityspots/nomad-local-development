@@ -1,5 +1,15 @@
 #!/bin/bash
 
+echo "[virt7-rkt-common-candidate]
+name=virt7-rkt-common-candidate
+baseurl=http://cbs.centos.org/repos/virt7-rkt-common-candidate/x86_64/os/
+enabled=1
+gpgcheck=0" > /etc/yum.repos.d/rkt.repo
+
+sudo yum clean all
+
+sudo yum install rkt -y
+
 sudo yum install unzip -y
 
 NOMAD_VERSION=0.9.0
