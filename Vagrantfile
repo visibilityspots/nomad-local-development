@@ -17,7 +17,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     virtualbox.customize ["modifyvm", :id, "--memory", 3072]
   end
 
-      config.vm.hostname = "nomad"
+  config.vm.hostname = "nomad"
   config.vm.synced_folder "nomad", "/opt/nomad", type: "rsync", rsync__chown: false
   config.vm.synced_folder "prometheus", "/opt/prometheus", type: "rsync", rsync__chown: false
   config.vm.provision "shell", path: "initialize.sh"
