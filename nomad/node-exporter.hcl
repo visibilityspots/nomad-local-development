@@ -12,20 +12,26 @@ job "node-exporter" {
       mode     = "delay"
     }
 
+    network {
+      port "node_exporter" {
+        static = 9100
+        to = 9100
+      }
+    }
+
+
     task "node-exporter" {
       driver = "docker"
 
       config {
-        image = "prom/node-exporter:v0.17.0"
+        image = "prom/node-exporter"
+        ports = ["node_exporter"]
         force_pull = true
         volumes = [
           "/proc:/host/proc",
           "/sys:/host/sys",
           "/:/rootfs"
         ]
-        port_map {
-          http = 9100
-        }
         logging {
           type = "journald"
           config {
@@ -40,8 +46,7 @@ job "node-exporter" {
         tags = [
           "metrics"
         ]
-        port = "http"
-
+        port = "node_exporter"
 
         check {
           type = "http"
@@ -54,10 +59,6 @@ job "node-exporter" {
       resources {
         cpu    = 50
         memory = 100
-
-        network {
-          port "http" { static = "9100" }
-        }
       }
     }
   }

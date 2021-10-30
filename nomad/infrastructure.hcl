@@ -13,14 +13,6 @@ job "infrastructure" {
     }
 
     network {
-      port "consul_dns" {
-        static = 8600
-        to = 8600
-      }
-      port "consul" {
-        static = 8500
-        to = 8500
-      }
       port "dns" {
         static = 53
         to = 53
@@ -39,46 +31,15 @@ job "infrastructure" {
       }
     }
 
-    task "consul" {
-      driver = "docker"
-      env = {
-        CONSUL_BIND_INTERFACE="eth0"
-      }
-      config {
-        image = "consul"
-        force_pull = true
-        network_mode = "host"
-        ports = ["consul", "consul_dns"]
-        logging {
-          type = "journald"
-          config {
-            tag = "CONSUL"
-          }
-        }
-      }
-      service {
-        name = "consul"
-        address_mode = "driver"
-
-        check {
-          type = "http"
-          path = "/ui"
-          interval = "10s"
-          timeout = "2s"
-          port = "consul"
-        }
-      }
-    }
-
     task "dnsmasq" {
       driver = "docker"
 
       config {
-        image = "andyshinn/dnsmasq:2.78"
+        image = "andyshinn/dnsmasq"
         force_pull = true
         ports = ["dns"]
         args = [
-            "-S", "/consul/${NOMAD_IP_consul_consul_dns}#8600"
+            "-S", "/consul/${NOMAD_IP_dns}#8600"
         ]
         cap_add = [
             "NET_ADMIN",
@@ -114,9 +75,10 @@ job "infrastructure" {
       driver = "docker"
 
       config {
-        image = "prom/prometheus:v2.8.1"
+        image = "prom/prometheus"
         force_pull = true
-        dns_servers = ["${NOMAD_IP_dnsmasq_dns}"]
+        network_mode = "host"
+        dns_servers = ["${NOMAD_IP_dns}"]
         volumes = [
           "/opt/prometheus/:/etc/prometheus/"
         ]
@@ -161,9 +123,9 @@ job "infrastructure" {
       driver = "docker"
 
       config {
-        image = "google/cadvisor:v0.33.0"
+        image = "google/cadvisor"
         force_pull = true
-        dns_servers = ["${NOMAD_IP_dnsmasq_dns}"]
+        dns_servers = ["${NOMAD_IP_dns}"]
         volumes = [
           "/:/rootfs:ro",
           "/var/run:/var/run:rw",
@@ -207,7 +169,7 @@ job "infrastructure" {
       driver = "docker"
 
       config {
-        image = "prom/node-exporter:v0.17.0"
+        image = "prom/node-exporter"
         force_pull = true
         ports = ["node_exporter"]
         volumes = [

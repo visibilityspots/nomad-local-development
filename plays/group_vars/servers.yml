@@ -1,6 +1,6 @@
 consul__server: true
 nomad__server: true
 
-nomad__interface: "{% if ansible_virtualization_type == 'virtualbox' %}eth1{% elif ansible_virtualization_type == 'lxc' %}eth0{% endif %}"
-consul__interface: "{% if ansible_virtualization_type == 'virtualbox' %}eth1{% elif ansible_virtualization_type == 'lxc' %}eth0{% endif %}"
-nomad__addr: "http://{% if ansible_virtualization_type == 'virtualbox' %}{{ ansible_eth1.ipv4.address }}{% elif ansible_virtualization_type == 'lxc' %}{{ ansible_eth0.ipv4.address }}{% endif %}:4646"
+nomad__interface: "{% if ansible_virtualization_type == 'virtualbox' %}eth0{% elif ansible_virtualization_type == 'lxc' %}eth0{% endif %}"
+consul__interface: "{% if ansible_virtualization_type == 'virtualbox' %}eth0{% elif ansible_virtualization_type == 'lxc' %}eth0{% endif %}"
+nomad__addr: "http://{% if ansible_virtualization_type == 'virtualbox' %}{{ ansible_eth0.ipv4.address }}{% elif ansible_virtualization_type == 'lxc' %}{{ ansible_eth0.ipv4.address }}{% endif %}:4646"

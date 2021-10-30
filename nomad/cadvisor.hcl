@@ -12,11 +12,20 @@ job "cadvisor" {
       mode     = "delay"
     }
 
+    network {
+      port "cadvisor" {
+        static = 8080
+        to = 8080
+      }
+    }
+
+
     task "cadvisor" {
       driver = "docker"
 
       config {
-        image = "google/cadvisor:v0.33.0"
+        image = "google/cadvisor"
+        ports = ["cadvisor"]
         force_pull = true
         volumes = [
           "/:/rootfs:ro",
@@ -25,9 +34,6 @@ job "cadvisor" {
           "/var/lib/docker/:/var/lib/docker:ro",
           "/cgroup:/cgroup:ro"
         ]
-        port_map {
-          http = 8080
-        }
         logging {
           type = "journald"
           config {
@@ -42,7 +48,7 @@ job "cadvisor" {
         tags = [
           "metrics"
         ]
-        port = "http"
+        port = "cadvisor"
 
         check {
           type = "http"
@@ -55,10 +61,6 @@ job "cadvisor" {
       resources {
         cpu    = 50
         memory = 100
-
-        network {
-          port "http" { static = "8080" }
-        }
       }
     }
   }
