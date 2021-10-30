@@ -12,30 +12,48 @@ job "infrastructure" {
       mode     = "delay"
     }
 
+    network {
+      port "consul_dns" {
+        static = 8600
+        to = 8600
+      }
+      port "consul" {
+        static = 8500
+        to = 8500
+      }
+      port "dns" {
+        static = 53
+        to = 53
+      }
+      port "prometheus" {
+        static = 9090
+        to = 9090
+      }
+      port "node_exporter" {
+        static = 9100
+        to = 9100
+      }
+      port "cadvisor" {
+        static = 8080
+        to = 8080
+      }
+    }
+
     task "consul" {
       driver = "docker"
       env = {
         CONSUL_BIND_INTERFACE="eth0"
       }
       config {
-        image = "consul:1.4.4"
+        image = "consul"
         force_pull = true
         network_mode = "host"
+        ports = ["consul", "consul_dns"]
         logging {
           type = "journald"
           config {
             tag = "CONSUL"
           }
-        }
-      }
-      resources {
-        network {
-            port "consul_dns" {
-                static = 8600
-            }
-            port "consul" {
-                static = 8500
-            }
         }
       }
       service {
@@ -58,15 +76,13 @@ job "infrastructure" {
       config {
         image = "andyshinn/dnsmasq:2.78"
         force_pull = true
+        ports = ["dns"]
         args = [
             "-S", "/consul/${NOMAD_IP_consul_consul_dns}#8600"
         ]
         cap_add = [
             "NET_ADMIN",
         ]
-        port_map {
-          dns = 53
-        }
         logging {
           type = "journald"
           config {
@@ -91,10 +107,6 @@ job "infrastructure" {
       resources {
         cpu    = 50
         memory = 100
-
-        network {
-          port "dns" { static = "53" }
-        }
       }
     }
 
@@ -115,9 +127,6 @@ job "infrastructure" {
           "--web.console.templates=/usr/share/prometheus/consoles",
           "--web.enable-admin-api"
         ]
-        port_map {
-            http = 9090
-        }
         logging {
           type = "journald"
           config {
@@ -132,7 +141,7 @@ job "infrastructure" {
         tags = [
           "metrics"
         ]
-        port = "http"
+        port = "prometheus"
 
         check {
           type = "http"
@@ -145,12 +154,6 @@ job "infrastructure" {
       resources {
         cpu    = 50
         memory = 100
-
-        network {
-          port "http" {
-            static = "9090"
-          }
-        }
       }
     }
 
@@ -168,9 +171,7 @@ job "infrastructure" {
           "/var/lib/docker/:/var/lib/docker:ro",
           "/cgroup:/cgroup:ro"
         ]
-        port_map {
-          http = 8080
-        }
+        ports = ["cadvisor"]
         logging {
           type = "journald"
           config {
@@ -185,7 +186,8 @@ job "infrastructure" {
         tags = [
           "metrics"
         ]
-        port = "http"
+
+        port = "cadvisor"
 
         check {
           type = "http"
@@ -198,10 +200,6 @@ job "infrastructure" {
       resources {
         cpu    = 50
         memory = 100
-
-        network {
-          port "http" { static = "8080" }
-        }
       }
     }
 
@@ -211,14 +209,12 @@ job "infrastructure" {
       config {
         image = "prom/node-exporter:v0.17.0"
         force_pull = true
+        ports = ["node_exporter"]
         volumes = [
           "/proc:/host/proc",
           "/sys:/host/sys",
           "/:/rootfs"
         ]
-        port_map {
-          http = 9100
-        }
         logging {
           type = "journald"
           config {
@@ -234,8 +230,8 @@ job "infrastructure" {
         tags = [
           "metrics"
         ]
-        port = "http"
 
+        port = "node_exporter"
 
         check {
           type = "http"
@@ -248,10 +244,6 @@ job "infrastructure" {
       resources {
         cpu    = 50
         memory = 100
-
-        network {
-          port "http" { static = "9100" }
-        }
       }
     }
   }

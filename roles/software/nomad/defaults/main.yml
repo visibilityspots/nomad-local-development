@@ -1,0 +1,5 @@
+---
+nomad__server: false
+nomad__client: true
+nomad__interface: eth0
+nomad__addr: http://localhost:4646

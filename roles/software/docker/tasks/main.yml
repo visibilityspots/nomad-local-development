@@ -1,0 +1,18 @@
+---
+- name: install docker-ce repo
+  yum_repository:
+    name: docker-ce
+    description: docker repository
+    baseurl: https://download.docker.com/linux/centos/$releasever/$basearch/stable
+    gpgcheck: yes
+    gpgkey: https://download.docker.com/linux/centos/gpg
+
+- name: install docker-ce
+  yum:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - docker-ce
+    - docker-ce-cli
+    - containerd.io
+  notify: restart docker

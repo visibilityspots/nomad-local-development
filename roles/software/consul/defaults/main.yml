@@ -1,0 +1,4 @@
+---
+consul__interface: eth0
+consul__server: false
+consul__server_ip: 127.0.0.1

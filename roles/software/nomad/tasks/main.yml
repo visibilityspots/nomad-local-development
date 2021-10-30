@@ -1,0 +1,26 @@
+---
+- name: install hashicorp repo
+  yum_repository:
+    name: hashicorp
+    description: hashicorp repository
+    baseurl: https://rpm.releases.hashicorp.com/RHEL/$releasever/$basearch/stable
+    gpgcheck: yes
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
+
+- name: install nomad
+  yum:
+    name: nomad
+    state: installed
+
+- name: configure nomad
+  template:
+    src: nomad.hcl
+    dest: /etc/nomad.d/nomad.hcl
+    mode: 0644
+  notify: restart nomad
+
+- name: configure nomad profile.d
+  template:
+    src: nomad.sh
+    dest: /etc/profile.d/nomad.sh
+    mode: 0644

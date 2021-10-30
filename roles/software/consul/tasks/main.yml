@@ -1,0 +1,20 @@
+---
+- name: install hashicorp repo
+  yum_repository:
+    name: hashicorp
+    description: hashicorp repository
+    baseurl: https://rpm.releases.hashicorp.com/RHEL/$releasever/$basearch/stable
+    gpgcheck: yes
+    gpgkey: https://rpm.releases.hashicorp.com/gpg
+
+- name: install consul
+  yum:
+    name: consul
+    state: installed
+
+- name: configure consul
+  template:
+    src: consul.hcl
+    dest: /etc/consul.d/consul.hcl
+    mode: 0644
+  notify: restart consul
