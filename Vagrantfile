@@ -22,13 +22,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.define "nomad"
-
   config.vm.hostname = "nomad"
-  config.vm.synced_folder "nomad", "/opt/nomad", type: "rsync"
-  config.vm.synced_folder "prometheus", "/opt/prometheus", type: "rsync"
+
   config.vm.network "forwarded_port", guest: 8500, host: 8500
   config.vm.network "forwarded_port", guest: 4646, host: 4646
   config.vm.network "forwarded_port", guest: 9090, host: 9090
+
+  config.vm.synced_folder "nomad", "/opt/nomad", type: "rsync"
+  config.vm.synced_folder "prometheus", "/opt/prometheus", type: "rsync"
   config.vm.provision "ansible" do |ansible|
       ansible.config_file = "ansible.cfg"
       ansible.playbook = "plays/nomad.yml"

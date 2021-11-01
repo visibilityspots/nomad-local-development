@@ -7,3 +7,4 @@
     - role: software/docker
     - role: software/consul
     - role: software/nomad
+    - role: common/firewalld
